@@ -815,9 +815,9 @@
         }
 
         .image-container-viewport img {
-            max-width: 95%;
-            max-height: 95%;
-            object-fit: contain;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
             user-select: none;
             -webkit-user-drag: none;
             transition: transform 0.1s ease-out;
@@ -1137,30 +1137,84 @@
 
             .modal {
                 padding: 0.5rem;
+                align-items: flex-end; /* Align to bottom like modern mobile sheets */
+            }
+
+            .modal-close {
+                top: 1rem;
+                right: 1.25rem;
+                font-size: 2.2rem;
+                z-index: 1010; /* Keep close button above everything */
+                background: rgba(11, 19, 14, 0.8);
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                padding-bottom: 4px;
+                position: fixed; /* Make close button stay in place relative to screen */
             }
 
             .modal-container {
                 grid-template-columns: 1fr;
-                height: 95vh;
-                border-radius: 16px;
+                height: 92vh; /* Use most of the screen */
+                border-radius: 20px 20px 0 0; /* Modern bottom-sheet style */
+                display: block; /* Flow elements vertically */
+                overflow-y: auto; /* Container handles the scrolling */
+                background: rgba(11, 19, 14, 0.98);
             }
 
             .modal-image-panel {
-                height: 45%;
+                height: auto; /* Grow naturally to fit the image */
+                width: 100%;
+                overflow: visible;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                display: block;
+            }
+
+            .image-container-viewport {
+                height: auto;
+                width: 100%;
+                display: block;
+                position: relative;
+            }
+
+            .image-container-viewport img {
+                width: 100%;
+                height: auto;
+                object-fit: contain; /* Keep the portrait aspect ratio of the herbarium sheet fully visible without cropping */
+                display: block;
+            }
+
+            .zoom-controls {
+                position: absolute;
+                bottom: 1rem;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 10;
             }
 
             .modal-info-panel {
-                height: 55%;
-                padding: 1.25rem;
+                height: auto; /* Grow naturally */
+                overflow: visible; /* Scroll is handled by modal-container */
+                padding: 1.5rem 1.25rem;
             }
 
             .modal-header h2 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
 
             .modal-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+                grid-template-columns: 1fr 1fr; /* Keep 2-column layout for compact details on mobile */
+                gap: 0.85rem;
+            }
+
+            .detail-item.full-width {
+                grid-column: 1 / -1;
             }
 
             .autocomplete-suggestions {
