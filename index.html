@@ -202,6 +202,62 @@
             margin-bottom: 3.5rem;
         }
 
+        /* Autocomplete dropdown styles */
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(11, 19, 14, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--accent-primary);
+            border-radius: 16px;
+            margin-top: 0.5rem;
+            max-height: 350px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.15);
+            text-align: left;
+            display: none;
+        }
+
+        .autocomplete-suggestion {
+            padding: 0.8rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .autocomplete-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-suggestion:hover, 
+        .autocomplete-suggestion.selected {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-hover);
+        }
+
+        .autocomplete-suggestion em {
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .suggestion-type {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--text-secondary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
         .home-btn {
             background: rgba(22, 38, 29, 0.8);
             border: 1px solid var(--border-color);
@@ -987,7 +1043,8 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" id="home-search-input" placeholder="Search GVCH...">
+                    <input type="text" id="home-search-input" placeholder="Search GVCH..." autocomplete="off">
+                    <div id="home-autocomplete-suggestions" class="autocomplete-suggestions"></div>
                 </div>
                 
                 <div class="home-search-buttons">
@@ -1032,7 +1089,8 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" id="search-input" placeholder="Search GVCH...">
+                    <input type="text" id="search-input" placeholder="Search GVCH..." autocomplete="off">
+                    <div id="search-autocomplete-suggestions" class="autocomplete-suggestions"></div>
                 </div>
 
                 <div class="filter-group">
@@ -1378,6 +1436,159 @@
             });
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') closeModal();
+            });
+
+            // Set up Autocomplete for search inputs
+            setupAutocomplete(homeSearchInput, document.getElementById('home-autocomplete-suggestions'), (val) => {
+                homeSearchInput.value = val;
+                performHomeSearch();
+            });
+            setupAutocomplete(searchInput, document.getElementById('search-autocomplete-suggestions'), (val) => {
+                searchInput.value = val;
+                currentPage = 1;
+                applyFilters();
+            });
+        }
+
+        // Dynamic Autocomplete/Autofill logic
+        function setupAutocomplete(inputElement, suggestionsElement, onSelectCallback) {
+            let activeIndex = -1;
+
+            inputElement.addEventListener('input', () => {
+                const query = inputElement.value.trim().toLowerCase();
+                suggestionsElement.innerHTML = '';
+                activeIndex = -1;
+
+                if (query.length < 3) {
+                    suggestionsElement.style.display = 'none';
+                    return;
+                }
+
+                // Collect matching unique suggestions
+                const matches = [];
+                const seen = new Set();
+
+                for (let i = 0; i < herbariumData.length; i++) {
+                    const item = herbariumData[i];
+                    
+                    const name = (item.name || '').trim();
+                    const family = (item.family || '').trim();
+                    const barcode = (item.barcode || '').trim();
+                    const place = (item.place || '').trim();
+                    const collector = (item.collectedBy || '').trim();
+
+                    // Check Genera (first word of name)
+                    const nameParts = name.split(/\s+/);
+                    const genus = nameParts[0] || '';
+
+                    // Match criteria
+                    if (genus.toLowerCase().startsWith(query) && !seen.has('genus:' + genus.toLowerCase())) {
+                        seen.add('genus:' + genus.toLowerCase());
+                        matches.push({ text: genus, type: 'Genus', italic: true });
+                    }
+                    if (name.toLowerCase().includes(query) && !seen.has('specimen:' + name.toLowerCase())) {
+                        seen.add('specimen:' + name.toLowerCase());
+                        matches.push({ text: name, type: 'Specimen', italic: true });
+                    }
+                    if (family.toLowerCase().startsWith(query) && !seen.has('family:' + family.toLowerCase())) {
+                        seen.add('family:' + family.toLowerCase());
+                        matches.push({ text: family, type: 'Family', italic: false });
+                    }
+                    if (barcode.toLowerCase().includes(query) && !seen.has('barcode:' + barcode.toLowerCase())) {
+                        seen.add('barcode:' + barcode.toLowerCase());
+                        matches.push({ text: barcode, type: 'Barcode', italic: false });
+                    }
+                    if (place.toLowerCase().includes(query) && !seen.has('place:' + place.toLowerCase())) {
+                        seen.add('place:' + place.toLowerCase());
+                        matches.push({ text: place, type: 'Place', italic: false });
+                    }
+                    if (collector.toLowerCase().includes(query) && !seen.has('collector:' + collector.toLowerCase())) {
+                        seen.add('collector:' + collector.toLowerCase());
+                        matches.push({ text: collector, type: 'Collector', italic: false });
+                    }
+
+                    if (matches.length >= 25) break; // Collect a pool, then slice down to top 10 unique
+                }
+
+                // Slice down to top 10 unique matching entries
+                const top10 = matches.slice(0, 10);
+
+                if (top10.length === 0) {
+                    suggestionsElement.style.display = 'none';
+                    return;
+                }
+
+                top10.forEach((match, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'autocomplete-suggestion';
+                    div.id = `${suggestionsElement.id}-item-${idx}`;
+                    
+                    const textSpan = document.createElement('span');
+                    if (match.italic) {
+                        textSpan.innerHTML = `<em>${match.text}</em>`;
+                    } else {
+                        textSpan.textContent = match.text;
+                    }
+
+                    const typeSpan = document.createElement('span');
+                    typeSpan.className = 'suggestion-type';
+                    typeSpan.textContent = match.type;
+
+                    div.appendChild(textSpan);
+                    div.appendChild(typeSpan);
+
+                    div.addEventListener('click', () => {
+                        onSelectCallback(match.text);
+                        suggestionsElement.innerHTML = '';
+                        suggestionsElement.style.display = 'none';
+                    });
+
+                    suggestionsElement.appendChild(div);
+                });
+
+                suggestionsElement.style.display = 'block';
+            });
+
+            // Keyboard navigation in suggestions list
+            inputElement.addEventListener('keydown', (e) => {
+                const suggestions = suggestionsElement.querySelectorAll('.autocomplete-suggestion');
+                if (suggestions.length === 0) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (activeIndex < suggestions.length - 1) {
+                        if (activeIndex >= 0) suggestions[activeIndex].classList.remove('selected');
+                        activeIndex++;
+                        suggestions[activeIndex].classList.add('selected');
+                        suggestions[activeIndex].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (activeIndex > 0) {
+                        suggestions[activeIndex].classList.remove('selected');
+                        activeIndex--;
+                        suggestions[activeIndex].classList.add('selected');
+                        suggestions[activeIndex].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    if (activeIndex >= 0) {
+                        e.preventDefault();
+                        suggestions[activeIndex].click();
+                    }
+                } else if (e.key === 'Escape') {
+                    suggestionsElement.innerHTML = '';
+                    suggestionsElement.style.display = 'none';
+                    activeIndex = -1;
+                }
+            });
+
+            // Hide list when clicking outside
+            document.addEventListener('click', (e) => {
+                if (e.target !== inputElement && !suggestionsElement.contains(e.target)) {
+                    suggestionsElement.innerHTML = '';
+                    suggestionsElement.style.display = 'none';
+                    activeIndex = -1;
+                }
             });
         }
 
