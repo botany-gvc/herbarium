@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herbarium Digital Archives & Portal Viewer</title>
+    <title>GVCH - Herbarium Digital Archives & Portal</title>
     <!-- Outfit Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
             --verified-color: #34d399;
             --unverified-color: #fb7185;
             --glass-bg: rgba(11, 19, 14, 0.7);
-            --card-glow: rgba(16, 185, 129, 0.1);
+            --card-glow: rgba(16, 185, 129, 0.15);
         }
 
         * {
@@ -56,6 +56,12 @@
             align-items: center;
         }
 
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
         .logo-section h1 {
             font-size: 1.5rem;
             font-weight: 700;
@@ -75,6 +81,12 @@
             margin-top: 0.15rem;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
         .stats-badge {
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid rgba(16, 185, 129, 0.2);
@@ -85,6 +97,346 @@
             font-weight: 500;
         }
 
+        /* View sections */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Home Page Container */
+        .home-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 3.5rem auto;
+            padding: 0 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .home-container {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                margin: 2rem auto;
+            }
+        }
+
+        .home-search-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .gvch-logo {
+            font-size: 5.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, #a7f3d0 0%, #10b981 50%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 15px rgba(16, 185, 129, 0.15));
+        }
+
+        .gvch-sub {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            opacity: 0.9;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .home-search-box {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-bottom: 1.5rem;
+        }
+
+        .home-search-box input {
+            width: 100%;
+            padding: 1.1rem 1.5rem 1.1rem 3.5rem;
+            background: rgba(22, 38, 29, 0.55);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .home-search-box input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px var(--card-glow), 0 4px 20px rgba(0, 0, 0, 0.35);
+            background: rgba(22, 38, 29, 0.75);
+        }
+
+        .home-search-box svg {
+            position: absolute;
+            left: 1.35rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            opacity: 0.7;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+        }
+
+        .home-search-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .home-btn {
+            background: rgba(22, 38, 29, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .home-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--card-glow);
+            transform: translateY(-1px);
+        }
+
+        .home-btn-secondary {
+            background: transparent;
+            border-color: rgba(16, 185, 129, 0.4);
+            color: var(--text-secondary);
+        }
+
+        .home-btn-secondary:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--accent-hover);
+        }
+
+        /* Statistics menu */
+        .stats-section {
+            width: 100%;
+            max-width: 650px;
+            text-align: left;
+        }
+
+        .stats-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            opacity: 0.85;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 0.35rem;
+        }
+
+        .stats-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .stat-pill {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--text-primary);
+            padding: 0.4rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .stat-pill:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+        }
+
+        .stat-pill span.count {
+            background: rgba(16, 185, 129, 0.25);
+            color: #a7f3d0;
+            padding: 0.1rem 0.4rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Slideshow */
+        .slideshow-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(16, 185, 129, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 992px) {
+            .slideshow-panel {
+                max-width: 100%;
+            }
+        }
+
+        .slideshow-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slideshow-dots {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .slideshow-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .slideshow-dot.active {
+            background: var(--accent-primary);
+            width: 14px;
+            border-radius: 3px;
+        }
+
+        .slideshow-container-inner {
+            position: relative;
+            min-height: 480px;
+        }
+
+        .slideshow-card {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+
+        .slideshow-card.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slideshow-img-wrapper {
+            width: 100%;
+            padding-top: 110%;
+            background: #070c09;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .slideshow-img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
+
+        .slideshow-img-wrapper img:hover {
+            transform: scale(1.03);
+        }
+
+        .slideshow-barcode {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(11, 19, 14, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            z-index: 5;
+        }
+
+        .slideshow-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .slideshow-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .slideshow-name em {
+            font-style: italic;
+        }
+
+        .slideshow-family {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .slideshow-loc {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-top: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Results Page Container */
         .layout-container {
             display: grid;
             grid-template-columns: 320px 1fr;
@@ -273,7 +625,7 @@
             line-height: 1.3;
         }
 
-        .card-title italic, .card-title em {
+        .card-title em {
             font-style: italic;
         }
 
@@ -349,104 +701,110 @@
             pointer-events: all;
         }
 
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            outline: none;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
         .modal-container {
-            background: rgba(15, 27, 20, 0.95);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.15);
+            background: rgba(11, 19, 14, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
             width: 100%;
             max-width: 1000px;
             height: 80vh;
-            border-radius: 24px;
-            overflow: hidden;
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            transform: scale(0.95);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-        }
-
-        .modal.active .modal-container {
-            transform: scale(1);
+            grid-template-columns: 1.1fr 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
         }
 
         .modal-image-panel {
-            background: #040705;
+            background: #040806;
+            border-right: 1px solid var(--border-color);
             position: relative;
             display: flex;
-            align-items: center;
             justify-content: center;
-            border-right: 1px solid var(--border-color);
-            height: 100%;
+            align-items: center;
             overflow: hidden;
         }
 
-        /* Image Zoom Styling */
         .image-container-viewport {
             width: 100%;
             height: 100%;
-            position: relative;
-            overflow: hidden;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             cursor: grab;
+            position: relative;
         }
 
         .image-container-viewport:active {
             cursor: grabbing;
         }
 
-        .modal-image-panel img {
-            max-width: 100%;
-            max-height: 100%;
+        .image-container-viewport img {
+            max-width: 95%;
+            max-height: 95%;
             object-fit: contain;
-            transition: transform 0.15s ease-out;
-            transform-origin: center center;
             user-select: none;
             -webkit-user-drag: none;
+            transition: transform 0.1s ease-out;
+            transform-origin: center center;
         }
 
-        /* Zoom Control Bar */
         .zoom-controls {
             position: absolute;
             bottom: 1.25rem;
-            left: 50%;
-            transform: translateX(-50%);
             background: rgba(11, 19, 14, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border-color);
-            border-radius: 999px;
-            padding: 0.35rem 0.75rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
             display: flex;
-            gap: 0.5rem;
             align-items: center;
-            z-index: 5;
+            gap: 0.75rem;
+            z-index: 10;
         }
 
         .zoom-btn {
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: bold;
             cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             border-radius: 50%;
-            transition: all 0.2s ease;
+            transition: background 0.3s;
+            outline: none;
         }
 
         .zoom-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
         }
 
         .zoom-indicator {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-secondary);
             min-width: 40px;
             text-align: center;
         }
@@ -456,94 +814,73 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            height: 100%;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1.25rem;
-            right: 1.25rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: rotate(90deg);
         }
 
         .modal-header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.5rem;
         }
 
-        .modal-header .barcode {
+        .barcode {
             font-size: 0.85rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
             color: var(--accent-primary);
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .modal-header h2 {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
+            color: var(--text-primary);
             line-height: 1.2;
-            margin-bottom: 0.5rem;
         }
 
-        .modal-header h2 italic, .modal-header h2 em {
+        .modal-header h2 em {
             font-style: italic;
         }
 
-        .modal-header .author {
+        .author {
             font-size: 1rem;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+            font-style: italic;
         }
 
         .modal-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.25rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
         }
 
         .detail-item {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
         }
 
         .detail-item label {
-            display: block;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-secondary);
             opacity: 0.7;
-            margin-bottom: 0.25rem;
+            font-weight: 600;
         }
 
         .detail-item span {
             font-size: 0.95rem;
+            color: var(--text-primary);
             font-weight: 500;
         }
 
-        .detail-item.full-width {
-            grid-column: span 2;
-        }
-
-        /* Pagination & Info */
         .pagination-container {
             display: flex;
             justify-content: space-between;
@@ -619,82 +956,138 @@
 </head>
 <body>
     <header>
-        <div class="logo-section">
-            <h1>🌿 Herbarium Archive Explorer</h1>
+        <div class="logo-section" id="header-logo">
+            <h1>🌿 GVCH Portal</h1>
             <p>Unified Portal Viewer & Local Offline Database</p>
         </div>
-        <div class="stats-badge" id="stats-badge">Loading collections...</div>
+        <div class="nav-links">
+            <button class="btn" id="home-nav-btn" style="background: transparent; border-color: transparent; color: var(--accent-primary);">Home</button>
+            <button class="btn" id="search-nav-btn">Search Database</button>
+            <div class="stats-badge" id="stats-badge">Loading...</div>
+        </div>
     </header>
 
-    <div class="layout-container">
-        <!-- Sidebar Filter controls -->
-        <aside class="sidebar">
-            <div class="search-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" id="search-input" placeholder="Search barcode, species name...">
-            </div>
-
-            <div class="filter-group">
-                <label for="family-filter">Family</label>
-                <select id="family-filter">
-                    <option value="">All Families</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="district-filter">District</label>
-                <select id="district-filter">
-                    <option value="">All Districts</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="state-filter">State</label>
-                <select id="state-filter">
-                    <option value="">All States</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="verify-filter">Verification Status</label>
-                <select id="verify-filter">
-                    <option value="">All Statuses</option>
-                    <option value="true">Verified Only</option>
-                    <option value="false">Unverified Only</option>
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="category-filter">Category</label>
-                <select id="category-filter">
-                    <option value="">All Categories</option>
-                    <option value="Angiosperm">Angiosperm</option>
-                    <option value="Pteridophyte">Pteridophyte</option>
-                </select>
-            </div>
-        </aside>
-
-        <!-- Cards display area -->
-        <main class="content-area">
-            <div class="grid-header">
-                <h2 id="result-count">Showing 0 collections</h2>
-            </div>
-
-            <div class="grid-container" id="grid-container">
-                <!-- Cards injected here dynamically -->
-            </div>
-
-            <div class="pagination-container">
-                <div class="pagination-info" id="pagination-info">Showing 1 to 20 of 00</div>
-                <div class="pagination-buttons">
-                    <button class="btn" id="prev-btn" disabled>Previous</button>
-                    <button class="btn" id="next-btn" disabled>Next</button>
+    <!-- GVCH Home Page Section -->
+    <div id="home-view" class="view-section active">
+        <div class="home-container">
+            <div class="home-search-panel">
+                <div class="gvch-logo">GVCH</div>
+                <div class="gvch-sub">Herbarium Digital Archives & Portal Viewer</div>
+                
+                <div class="home-search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="home-search-input" placeholder="Search barcode, species name, collector, location...">
+                </div>
+                
+                <div class="home-search-buttons">
+                    <button class="home-btn" id="home-search-btn">Search Portal</button>
+                    <button class="home-btn home-btn-secondary" id="home-adv-btn">Advanced Search</button>
+                </div>
+                
+                <div class="stats-section">
+                    <div class="stats-title">Top 10 Families</div>
+                    <div class="stats-group" id="top-families-stats">
+                        <!-- Stat pills injected here -->
+                    </div>
+                    
+                    <div class="stats-title">Top 10 Genera</div>
+                    <div class="stats-group" id="top-genera-stats">
+                        <!-- Stat pills injected here -->
+                    </div>
                 </div>
             </div>
-        </main>
+            
+            <div class="slideshow-panel">
+                <div class="slideshow-title">
+                    <span>Featured Specimen</span>
+                    <div class="slideshow-dots" id="slideshow-dots">
+                        <!-- Dots injected here -->
+                    </div>
+                </div>
+                <div class="slideshow-container-inner" id="slideshow-container">
+                    <!-- Rotating cards injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Portal View Section -->
+    <div id="search-view" class="view-section">
+        <div class="layout-container">
+            <!-- Sidebar Filter controls -->
+            <aside class="sidebar">
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search barcode, species name...">
+                </div>
+
+                <div class="filter-group">
+                    <label for="family-filter">Family</label>
+                    <select id="family-filter">
+                        <option value="">All Families</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="district-filter">District</label>
+                    <select id="district-filter">
+                        <option value="">All Districts</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="state-filter">State</label>
+                    <select id="state-filter">
+                        <option value="">All States</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="verify-filter">Verification Status</label>
+                    <select id="verify-filter">
+                        <option value="">All Statuses</option>
+                        <option value="true">Verified Only</option>
+                        <option value="false">Unverified Only</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="category-filter">Category</label>
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Angiosperm">Angiosperm</option>
+                        <option value="Pteridophyte">Pteridophyte</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="reset-filters-btn" style="width: 100%; background: transparent; border-color: rgba(255,255,255,0.15);">Clear Filters</button>
+            </aside>
+
+            <!-- Cards display area -->
+            <main class="content-area">
+                <div class="grid-header">
+                    <h2 id="result-count">Showing 0 collections</h2>
+                </div>
+
+                <div class="grid-container" id="grid-container">
+                    <!-- Cards injected here dynamically -->
+                </div>
+
+                <div class="pagination-container">
+                    <div class="pagination-info" id="pagination-info">Showing 1 to 20 of 00</div>
+                    <div class="pagination-buttons">
+                        <button class="btn" id="prev-btn" disabled>Previous</button>
+                        <button class="btn" id="next-btn" disabled>Next</button>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <!-- Details View Modal -->
@@ -793,6 +1186,7 @@
         const stateFilter = document.getElementById('state-filter');
         const verifyFilter = document.getElementById('verify-filter');
         const categoryFilter = document.getElementById('category-filter');
+        const resetFiltersBtn = document.getElementById('reset-filters-btn');
 
         // Modal elements
         const detailsModal = document.getElementById('details-modal');
@@ -826,6 +1220,23 @@
         let imgPosY = 0;
         let dragStartX = 0;
         let dragStartY = 0;
+
+        // View elements
+        const homeView = document.getElementById('home-view');
+        const searchView = document.getElementById('search-view');
+        const homeNavBtn = document.getElementById('home-nav-btn');
+        const searchNavBtn = document.getElementById('search-nav-btn');
+        const headerLogo = document.getElementById('header-logo');
+
+        // Home View elements
+        const homeSearchInput = document.getElementById('home-search-input');
+        const homeSearchBtn = document.getElementById('home-search-btn');
+        const homeAdvBtn = document.getElementById('home-adv-btn');
+
+        // Slideshow variables
+        let slideshowInterval = null;
+        let slideshowIndex = 0;
+        let slideshowItems = [];
 
         function updateZoomTransform() {
             modalImage.style.transform = `translate(${imgPosX}px, ${imgPosY}px) scale(${zoomScale})`;
@@ -877,6 +1288,27 @@
 
         zoomResetBtn.addEventListener('click', resetZoom);
 
+        // View toggle logic
+        function switchView(view) {
+            if (view === 'home') {
+                homeView.classList.add('active');
+                searchView.classList.remove('active');
+                
+                homeNavBtn.style.color = 'var(--accent-primary)';
+                searchNavBtn.style.color = 'var(--text-primary)';
+                searchNavBtn.style.background = 'rgba(22, 38, 29, 0.6)';
+                searchNavBtn.style.borderColor = 'var(--border-color)';
+            } else {
+                homeView.classList.remove('active');
+                searchView.classList.add('active');
+                
+                homeNavBtn.style.color = 'var(--text-primary)';
+                searchNavBtn.style.color = 'var(--text-primary)';
+                searchNavBtn.style.background = 'var(--accent-primary)';
+                searchNavBtn.style.borderColor = 'var(--accent-primary)';
+            }
+        }
+
         // Initial setup
         function init() {
             if (typeof herbariumData === 'undefined') {
@@ -886,19 +1318,47 @@
 
             statsBadge.textContent = `Total Records: ${herbariumData.length}`;
             
+            // Generate Live Statistics Menu
+            calculateStats();
+
+            // Set up Random Specimen Showcase Slideshow
+            setupSlideshow();
+            
             // Populate filter options dynamically
             populateFilters();
             
             // Initial filter & render
             applyFilters();
             
-            // Event listeners
+            // Navigation Event Listeners
+            homeNavBtn.addEventListener('click', () => switchView('home'));
+            searchNavBtn.addEventListener('click', () => switchView('search'));
+            headerLogo.addEventListener('click', () => switchView('home'));
+
+            // Home View Event Listeners
+            homeSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    performHomeSearch();
+                }
+            });
+            homeSearchBtn.addEventListener('click', performHomeSearch);
+            homeAdvBtn.addEventListener('click', () => {
+                resetFilters();
+                switchView('search');
+                searchInput.focus();
+            });
+
+            // Results View Event Listeners
             searchInput.addEventListener('input', () => { currentPage = 1; applyFilters(); });
             familyFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
             districtFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
             stateFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
             verifyFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
             categoryFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+            resetFiltersBtn.addEventListener('click', () => {
+                resetFilters();
+                applyFilters();
+            });
             
             prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderGrid(); } });
             nextBtn.addEventListener('click', () => { if (currentPage * itemsPerPage < filteredData.length) { currentPage++; renderGrid(); } });
@@ -906,12 +1366,173 @@
             // Close modal
             modalCloseBtn.addEventListener('click', closeModal);
             detailsModal.addEventListener('click', (e) => {
-                // Allow clicking outside the container to close
                 if (e.target === detailsModal) closeModal();
             });
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') closeModal();
             });
+        }
+
+        // Live statistics menu helper
+        function calculateStats() {
+            const familyCounts = {};
+            const genusCounts = {};
+
+            herbariumData.forEach(item => {
+                // Family
+                if (item.family) {
+                    const fam = item.family.trim();
+                    familyCounts[fam] = (familyCounts[fam] || 0) + 1;
+                }
+
+                // Genus
+                if (item.name) {
+                    const parts = item.name.trim().split(/\s+/);
+                    if (parts.length > 0) {
+                        const genus = parts[0];
+                        if (genus.length > 1 && !/^[0-9]/.test(genus)) {
+                            genusCounts[genus] = (genusCounts[genus] || 0) + 1;
+                        }
+                    }
+                }
+            });
+
+            // Sort and take top 10
+            const topFamilies = Object.entries(familyCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            const topGenera = Object.entries(genusCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            // Render Families Stats
+            const familyStatsDiv = document.getElementById('top-families-stats');
+            familyStatsDiv.innerHTML = '';
+            topFamilies.forEach(([family, count]) => {
+                const pill = document.createElement('div');
+                pill.className = 'stat-pill';
+                pill.innerHTML = `${family} <span class="count">${count}</span>`;
+                pill.addEventListener('click', () => {
+                    resetFilters();
+                    familyFilter.value = family;
+                    currentPage = 1;
+                    applyFilters();
+                    switchView('search');
+                });
+                familyStatsDiv.appendChild(pill);
+            });
+
+            // Render Genera Stats
+            const genusStatsDiv = document.getElementById('top-genera-stats');
+            genusStatsDiv.innerHTML = '';
+            topGenera.forEach(([genus, count]) => {
+                const pill = document.createElement('div');
+                pill.className = 'stat-pill';
+                pill.innerHTML = `<em>${genus}</em> <span class="count">${count}</span>`;
+                pill.addEventListener('click', () => {
+                    resetFilters();
+                    searchInput.value = genus;
+                    currentPage = 1;
+                    applyFilters();
+                    switchView('search');
+                });
+                genusStatsDiv.appendChild(pill);
+            });
+        }
+
+        // Slideshow setup
+        function setupSlideshow() {
+            if (herbariumData.length === 0) return;
+
+            // Pick 5 random specimens
+            const shuffled = [...herbariumData].sort(() => 0.5 - Math.random());
+            slideshowItems = shuffled.slice(0, 5);
+
+            const container = document.getElementById('slideshow-container');
+            const dotsContainer = document.getElementById('slideshow-dots');
+            container.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            slideshowItems.forEach((item, idx) => {
+                // Card element
+                const card = document.createElement('div');
+                card.className = `slideshow-card ${idx === 0 ? 'active' : ''}`;
+                card.id = `slide-${idx}`;
+
+                const imgPath = item.local_image_path ? item.local_image_path : item.photoURL;
+
+                card.innerHTML = `
+                    <div class="slideshow-img-wrapper">
+                        <span class="slideshow-barcode">${item.barcode || 'No Barcode'}</span>
+                        <img src="${imgPath}" alt="${item.name}" onerror="this.src='https://placehold.co/240x310?text=No+Image';">
+                    </div>
+                    <div class="slideshow-info">
+                        <div class="slideshow-name"><em>${item.name || 'Unknown Specimen'}</em></div>
+                        <div class="slideshow-family">${item.family || 'Unknown Family'}</div>
+                        <div class="slideshow-loc">
+                            <span>${item.place || 'Unknown Place'}, ${item.district || ''}</span>
+                            <span style="color: var(--accent-primary); font-weight: 600;">${item.verify ? 'Verified' : 'Unverified'}</span>
+                        </div>
+                    </div>
+                `;
+
+                card.querySelector('img').addEventListener('click', () => showDetails(item));
+                container.appendChild(card);
+
+                // Dot element
+                const dot = document.createElement('div');
+                dot.className = `slideshow-dot ${idx === 0 ? 'active' : ''}`;
+                dot.id = `slide-dot-${idx}`;
+                dot.addEventListener('click', () => setSlideActive(idx));
+                dotsContainer.appendChild(dot);
+            });
+
+            // Start rotation interval (5 seconds)
+            if (slideshowInterval) clearInterval(slideshowInterval);
+            slideshowInterval = setInterval(() => {
+                let nextIdx = (slideshowIndex + 1) % slideshowItems.length;
+                setSlideActive(nextIdx);
+            }, 5000);
+        }
+
+        function setSlideActive(idx) {
+            if (idx === slideshowIndex) return;
+
+            const currentCard = document.getElementById(`slide-${slideshowIndex}`);
+            const currentDot = document.getElementById(`slide-dot-${slideshowIndex}`);
+            const nextCard = document.getElementById(`slide-${idx}`);
+            const nextDot = document.getElementById(`slide-dot-${idx}`);
+
+            if (currentCard) currentCard.classList.remove('active');
+            if (currentDot) currentDot.classList.remove('active');
+            if (nextCard) nextCard.classList.add('active');
+            if (nextDot) nextDot.classList.add('active');
+
+            slideshowIndex = idx;
+        }
+
+        // Perform Search from Home View
+        function performHomeSearch() {
+            const query = homeSearchInput.value.trim();
+            resetFilters();
+            if (query) {
+                searchInput.value = query;
+            }
+            currentPage = 1;
+            applyFilters();
+            switchView('search');
+        }
+
+        // Reset all filter selections
+        function resetFilters() {
+            homeSearchInput.value = '';
+            searchInput.value = '';
+            familyFilter.value = '';
+            districtFilter.value = '';
+            stateFilter.value = '';
+            verifyFilter.value = '';
+            categoryFilter.value = '';
         }
 
         function populateFilters() {
@@ -957,7 +1578,6 @@
             const category = categoryFilter.value;
 
             filteredData = herbariumData.filter(item => {
-                // Search query matching
                 const name = (item.name || '').toLowerCase();
                 const barcode = (item.barcode || '').toLowerCase();
                 const collector = (item.collectedBy || '').toLowerCase();
@@ -1009,7 +1629,6 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 
-                // Fallback to web URL if local download fails, otherwise local image path
                 const imgPath = item.local_image_path ? item.local_image_path : item.photoURL;
                 
                 card.innerHTML = `
@@ -1053,7 +1672,6 @@
             modalState.textContent = item.state || 'N/A';
             modalPlace.textContent = item.place || 'N/A';
             
-            // Format Date
             if (item.date) {
                 try {
                     modalDate.textContent = item.date.split('T')[0];
@@ -1072,7 +1690,6 @@
             
             modalTypeStatus.textContent = item.typeStatus || 'None';
             
-            // Compile optional descriptive fields
             let notesText = [];
             if (item.habit) notesText.push(`Habit: ${item.habit}`);
             if (item.habitat) notesText.push(`Habitat: ${item.habitat}`);
