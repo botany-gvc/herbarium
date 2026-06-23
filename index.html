@@ -1010,6 +1010,168 @@
                 padding: 1.5rem;
             }
         }
+
+        /* Mobile Optimization and Touch Support */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.4rem 0.75rem;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0.5rem;
+                height: auto;
+            }
+
+            .logo-section {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            .logo-section img {
+                height: 30px !important;
+                width: auto;
+            }
+
+            .logo-section div {
+                text-align: left;
+            }
+
+            .logo-section h1 {
+                font-size: 0.85rem;
+                line-height: 1.1;
+            }
+
+            .logo-section p {
+                font-size: 0.6rem;
+                margin-top: 0;
+                line-height: 1;
+            }
+
+            .nav-links {
+                width: auto;
+                display: flex;
+                flex-direction: row;
+                gap: 0.35rem;
+                align-items: center;
+            }
+
+            .nav-links .btn {
+                width: auto;
+                padding: 0.35rem 0.65rem;
+                font-size: 0.75rem;
+                text-align: center;
+                border-radius: 6px;
+            }
+
+            /* Hide the stats badge inside header on mobile to save vertical screen space */
+            .stats-badge {
+                display: none;
+            }
+
+            /* Make sure Home takes the left side and Search takes the right side */
+            #home-nav-btn {
+                order: 1;
+            }
+
+            #search-nav-btn {
+                order: 2;
+            }
+
+            .home-container {
+                grid-template-columns: 1fr;
+                margin: 1.5rem auto;
+                padding: 0 1rem;
+                gap: 2rem;
+            }
+
+            .gvch-logo {
+                font-size: 4rem;
+            }
+
+            .gvch-sub {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .home-search-buttons {
+                width: 100%;
+                flex-direction: column;
+                gap: 0.75rem;
+                margin-bottom: 2rem;
+            }
+
+            .home-btn {
+                width: 100%;
+                padding: 0.85rem;
+            }
+
+            .slideshow-panel {
+                max-width: 100%;
+            }
+
+            .slideshow-container-inner {
+                min-height: 400px;
+            }
+
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+
+            .card-content {
+                padding: 0.75rem;
+            }
+
+            .card-title {
+                font-size: 0.85rem;
+            }
+
+            .card-meta {
+                font-size: 0.75rem;
+            }
+
+            .modal {
+                padding: 0.5rem;
+            }
+
+            .modal-container {
+                grid-template-columns: 1fr;
+                height: 95vh;
+                border-radius: 16px;
+            }
+
+            .modal-image-panel {
+                height: 45%;
+            }
+
+            .modal-info-panel {
+                height: 55%;
+                padding: 1.25rem;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .autocomplete-suggestions {
+                max-height: 250px;
+            }
+
+            .autocomplete-suggestion {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1339,6 +1501,43 @@
         });
 
         window.addEventListener('mouseup', () => {
+            isDraggingImage = false;
+        });
+
+        // Touch zoom & pan support for mobile browsers
+        let initialTouchDist = 0;
+        zoomViewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDraggingImage = true;
+                dragStartX = e.touches[0].clientX - imgPosX;
+                dragStartY = e.touches[0].clientY - imgPosY;
+            } else if (e.touches.length === 2) {
+                isDraggingImage = false;
+                initialTouchDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (isDraggingImage && e.touches.length === 1) {
+                imgPosX = e.touches[0].clientX - dragStartX;
+                imgPosY = e.touches[0].clientY - dragStartY;
+                updateZoomTransform();
+            } else if (e.touches.length === 2) {
+                const currentDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const zoomFactor = currentDist / initialTouchDist;
+                zoomScale = Math.max(0.5, Math.min(6, zoomScale * zoomFactor));
+                initialTouchDist = currentDist;
+                updateZoomTransform();
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
             isDraggingImage = false;
         });
 
