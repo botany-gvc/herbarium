@@ -58,7 +58,9 @@
 
         .logo-section {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.85rem;
             cursor: pointer;
         }
 
@@ -957,8 +959,11 @@
 <body>
     <header>
         <div class="logo-section" id="header-logo">
-            <h1>🌿 GVCH, Department of Botany</h1>
-            <p>Government Victoria College, Palakkad</p>
+            <img src="logo.png" alt="College Logo" style="height: 45px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+            <div style="display: flex; flex-direction: column;">
+                <h1>GVCH, Department of Botany</h1>
+                <p>Government Victoria College, Palakkad</p>
+            </div>
         </div>
         <div class="nav-links">
             <button class="btn" id="home-nav-btn" style="background: transparent; border-color: transparent; color: var(--accent-primary);">Home</button>
@@ -1535,6 +1540,7 @@
             categoryFilter.value = '';
         }
 
+        // Populate filters dynamically
         function populateFilters() {
             const families = new Set();
             const districts = new Set();
