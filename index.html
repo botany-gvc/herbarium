@@ -976,7 +976,10 @@
     <div id="home-view" class="view-section active">
         <div class="home-container">
             <div class="home-search-panel">
-                <div class="gvch-logo">GVCH</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1.25rem; margin-bottom: 0.25rem;">
+                    <img src="logo.png" alt="GVCH Logo" style="height: 85px; width: auto; filter: drop-shadow(0 4px 15px rgba(16, 185, 129, 0.2));">
+                    <div class="gvch-logo" style="margin-bottom: 0;">GVCH</div>
+                </div>
                 <div class="gvch-sub">Government Victoria College Palakkad</div>
                 
                 <div class="home-search-box">
@@ -1504,10 +1507,10 @@
         function setSlideActive(idx) {
             if (idx === slideshowIndex) return;
 
-            const currentCard = document.getElementById(`slide-${slideshowIndex}`);
-            const currentDot = document.getElementById(`slide-dot-${slideshowIndex}`);
-            const nextCard = document.getElementById(`slide-${idx}`);
-            const nextDot = document.getElementById(`slide-dot-${idx}`);
+            const currentCard = document.getElementById('slide-' + slideshowIndex);
+            const currentDot = document.getElementById('slide-dot-' + slideshowIndex);
+            const nextCard = document.getElementById('slide-' + idx);
+            const nextDot = document.getElementById('slide-dot-' + idx);
 
             if (currentCard) currentCard.classList.remove('active');
             if (currentDot) currentDot.classList.remove('active');
