@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herbarium Digital Archives & Portal Viewer</title>
+    <!-- Outfit Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b130e;
+            --surface-color: rgba(22, 38, 29, 0.45);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f0fdf4;
+            --text-secondary: #a7f3d0;
+            --accent-primary: #10b981;
+            --accent-secondary: #059669;
+            --accent-hover: #34d399;
+            --verified-color: #34d399;
+            --unverified-color: #fb7185;
+            --glass-bg: rgba(11, 19, 14, 0.7);
+            --card-glow: rgba(16, 185, 129, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #a7f3d0 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-section p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            margin-top: 0.15rem;
+        }
+
+        .stats-badge {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: calc(100vh - 75px);
+        }
+
+        /* Sidebar / Filters */
+        .sidebar {
+            background: rgba(11, 19, 14, 0.4);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem;
+            position: sticky;
+            top: 75px;
+            height: calc(100vh - 75px);
+            overflow-y: auto;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 2.5rem;
+            background: rgba(22, 38, 29, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px var(--card-glow);
+            background: rgba(22, 38, 29, 0.8);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            opacity: 0.6;
+            pointer-events: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(22, 38, 29, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a7f3d0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25em;
+        }
+
+        .filter-group select:focus {
+            border-color: var(--accent-primary);
+            background-color: rgba(22, 38, 29, 0.8);
+        }
+
+        /* Main Content Grid */
+        .content-area {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px var(--card-glow);
+        }
+
+        .card-image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 130%; /* Portrait aspect ratio typical for herbarium sheets */
+            background: #070c09;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-image-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(11, 19, 14, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .card-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .card-title italic, .card-title em {
+            font-style: italic;
+        }
+
+        .card-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.85;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 0.75rem;
+        }
+
+        .status-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 500;
+        }
+
+        .status-dot::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-dot.verified {
+            color: var(--verified-color);
+        }
+        .status-dot.verified::before {
+            background-color: var(--verified-color);
+            box-shadow: 0 0 6px var(--verified-color);
+        }
+
+        .status-dot.unverified {
+            color: var(--unverified-color);
+        }
+        .status-dot.unverified::before {
+            background-color: var(--unverified-color);
+            box-shadow: 0 0 6px var(--unverified-color);
+        }
+
+        /* Modal Details View */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 7, 5, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-container {
+            background: rgba(15, 27, 20, 0.95);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.15);
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            border-radius: 24px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            transform: scale(0.95);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .modal.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-image-panel {
+            background: #040705;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Image Zoom Styling */
+        .image-container-viewport {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+        }
+
+        .image-container-viewport:active {
+            cursor: grabbing;
+        }
+
+        .modal-image-panel img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.15s ease-out;
+            transform-origin: center center;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Zoom Control Bar */
+        .zoom-controls {
+            position: absolute;
+            bottom: 1.25rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(11, 19, 14, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: 0.35rem 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .zoom-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .zoom-indicator {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .modal-info-panel {
+            padding: 2.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header .barcode {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header h2 italic, .modal-header h2 em {
+            font-style: italic;
+        }
+
+        .modal-header .author {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.75rem;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .detail-item.full-width {
+            grid-column: span 2;
+        }
+
+        /* Pagination & Info */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            background: rgba(22, 38, 29, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px var(--card-glow);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 1.5rem;
+            }
+            .modal-container {
+                grid-template-columns: 1fr;
+                height: 90vh;
+            }
+            .modal-image-panel {
+                height: 40%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .modal-info-panel {
+                height: 60%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-section">
+            <h1>🌿 Herbarium Archive Explorer</h1>
+            <p>Unified Portal Viewer & Local Offline Database</p>
+        </div>
+        <div class="stats-badge" id="stats-badge">Loading collections...</div>
+    </header>
+
+    <div class="layout-container">
+        <!-- Sidebar Filter controls -->
+        <aside class="sidebar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" placeholder="Search barcode, species name...">
+            </div>
+
+            <div class="filter-group">
+                <label for="family-filter">Family</label>
+                <select id="family-filter">
+                    <option value="">All Families</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="district-filter">District</label>
+                <select id="district-filter">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="state-filter">State</label>
+                <select id="state-filter">
+                    <option value="">All States</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="verify-filter">Verification Status</label>
+                <select id="verify-filter">
+                    <option value="">All Statuses</option>
+                    <option value="true">Verified Only</option>
+                    <option value="false">Unverified Only</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="category-filter">Category</label>
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="Angiosperm">Angiosperm</option>
+                    <option value="Pteridophyte">Pteridophyte</option>
+                </select>
+            </div>
+        </aside>
+
+        <!-- Cards display area -->
+        <main class="content-area">
+            <div class="grid-header">
+                <h2 id="result-count">Showing 0 collections</h2>
+            </div>
+
+            <div class="grid-container" id="grid-container">
+                <!-- Cards injected here dynamically -->
+            </div>
+
+            <div class="pagination-container">
+                <div class="pagination-info" id="pagination-info">Showing 1 to 20 of 00</div>
+                <div class="pagination-buttons">
+                    <button class="btn" id="prev-btn" disabled>Previous</button>
+                    <button class="btn" id="next-btn" disabled>Next</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Details View Modal -->
+    <div class="modal" id="details-modal">
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+        <div class="modal-container">
+            <div class="modal-image-panel">
+                <div class="image-container-viewport" id="zoom-viewport">
+                    <img id="modal-image" src="" alt="Herbarium Specimen">
+                </div>
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoom-out-btn" title="Zoom Out">-</button>
+                    <span class="zoom-indicator" id="zoom-value">100%</span>
+                    <button class="zoom-btn" id="zoom-in-btn" title="Zoom In">+</button>
+                    <button class="zoom-btn" id="zoom-reset-btn" title="Reset Zoom" style="font-size:0.85rem; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:6px; border-radius:0;">Reset</button>
+                </div>
+            </div>
+            <div class="modal-info-panel">
+                <div class="modal-header">
+                    <div class="barcode" id="modal-barcode">GVCH000001</div>
+                    <h2 id="modal-name">Scutellaria wightiana</h2>
+                    <div class="author" id="modal-author">Benth.</div>
+                </div>
+
+                <div class="modal-grid">
+                    <div class="detail-item">
+                        <label>Family</label>
+                        <span id="modal-family">Lamiaceae</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Category</label>
+                        <span id="modal-category">Angiosperm</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>District</label>
+                        <span id="modal-district">Thrissur</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>State</label>
+                        <span id="modal-state">Kerala</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Place of Collection</label>
+                        <span id="modal-place">Nattika</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Date of Collection</label>
+                        <span id="modal-date">1974-06-05</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Collection No.</label>
+                        <span id="modal-col-no">170</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Collected By</label>
+                        <span id="modal-collected-by">Madhavi TS</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Verification Status</label>
+                        <span id="modal-verify">Verified</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Type Status</label>
+                        <span id="modal-type-status">None</span>
+                    </div>
+                    <div class="detail-item full-width">
+                        <label>Habitat / Soil Type / Notes</label>
+                        <span id="modal-notes">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data JS Import -->
+    <script src="data.js"></script>
+    <script>
+        // Pagination state
+        let currentPage = 1;
+        const itemsPerPage = 32;
+        let filteredData = [];
+
+        // DOM elements
+        const gridContainer = document.getElementById('grid-container');
+        const statsBadge = document.getElementById('stats-badge');
+        const resultCountText = document.getElementById('result-count');
+        const paginationInfo = document.getElementById('pagination-info');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        
+        // Filter inputs
+        const searchInput = document.getElementById('search-input');
+        const familyFilter = document.getElementById('family-filter');
+        const districtFilter = document.getElementById('district-filter');
+        const stateFilter = document.getElementById('state-filter');
+        const verifyFilter = document.getElementById('verify-filter');
+        const categoryFilter = document.getElementById('category-filter');
+
+        // Modal elements
+        const detailsModal = document.getElementById('details-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalImage = document.getElementById('modal-image');
+        const modalBarcode = document.getElementById('modal-barcode');
+        const modalName = document.getElementById('modal-name');
+        const modalAuthor = document.getElementById('modal-author');
+        const modalFamily = document.getElementById('modal-family');
+        const modalCategory = document.getElementById('modal-category');
+        const modalDistrict = document.getElementById('modal-district');
+        const modalState = document.getElementById('modal-state');
+        const modalPlace = document.getElementById('modal-place');
+        const modalDate = document.getElementById('modal-date');
+        const modalColNo = document.getElementById('modal-col-no');
+        const modalCollectedBy = document.getElementById('modal-collected-by');
+        const modalVerify = document.getElementById('modal-verify');
+        const modalTypeStatus = document.getElementById('modal-type-status');
+        const modalNotes = document.getElementById('modal-notes');
+
+        // Zoom elements & logic
+        const zoomViewport = document.getElementById('zoom-viewport');
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const zoomResetBtn = document.getElementById('zoom-reset-btn');
+        const zoomValueDisp = document.getElementById('zoom-value');
+
+        let zoomScale = 1;
+        let isDraggingImage = false;
+        let imgPosX = 0;
+        let imgPosY = 0;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        function updateZoomTransform() {
+            modalImage.style.transform = `translate(${imgPosX}px, ${imgPosY}px) scale(${zoomScale})`;
+            zoomValueDisp.textContent = `${Math.round(zoomScale * 100)}%`;
+        }
+
+        function resetZoom() {
+            zoomScale = 1;
+            imgPosX = 0;
+            imgPosY = 0;
+            updateZoomTransform();
+        }
+
+        // Mouse zoom & pan handlers
+        zoomViewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomDelta = e.deltaY < 0 ? 0.15 : -0.15;
+            zoomScale = Math.max(0.5, Math.min(6, zoomScale + zoomDelta));
+            updateZoomTransform();
+        });
+
+        zoomViewport.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isDraggingImage = true;
+            dragStartX = e.clientX - imgPosX;
+            dragStartY = e.clientY - imgPosY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDraggingImage) return;
+            imgPosX = e.clientX - dragStartX;
+            imgPosY = e.clientY - dragStartY;
+            updateZoomTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDraggingImage = false;
+        });
+
+        zoomInBtn.addEventListener('click', () => {
+            zoomScale = Math.min(6, zoomScale + 0.25);
+            updateZoomTransform();
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            zoomScale = Math.max(0.5, zoomScale - 0.25);
+            updateZoomTransform();
+        });
+
+        zoomResetBtn.addEventListener('click', resetZoom);
+
+        // Initial setup
+        function init() {
+            if (typeof herbariumData === 'undefined') {
+                statsBadge.textContent = "Data loading error!";
+                return;
+            }
+
+            statsBadge.textContent = `Total Records: ${herbariumData.length}`;
+            
+            // Populate filter options dynamically
+            populateFilters();
+            
+            // Initial filter & render
+            applyFilters();
+            
+            // Event listeners
+            searchInput.addEventListener('input', () => { currentPage = 1; applyFilters(); });
+            familyFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+            districtFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+            stateFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+            verifyFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+            categoryFilter.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+            
+            prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderGrid(); } });
+            nextBtn.addEventListener('click', () => { if (currentPage * itemsPerPage < filteredData.length) { currentPage++; renderGrid(); } });
+            
+            // Close modal
+            modalCloseBtn.addEventListener('click', closeModal);
+            detailsModal.addEventListener('click', (e) => {
+                // Allow clicking outside the container to close
+                if (e.target === detailsModal) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        }
+
+        function populateFilters() {
+            const families = new Set();
+            const districts = new Set();
+            const states = new Set();
+
+            herbariumData.forEach(item => {
+                if (item.family) families.add(item.family.trim());
+                if (item.district) districts.add(item.district.trim().toUpperCase());
+                if (item.state) states.add(item.state.trim().toUpperCase());
+            });
+
+            // Sort and add options
+            Array.from(families).sort().forEach(fam => {
+                const opt = document.createElement('option');
+                opt.value = fam;
+                opt.textContent = fam;
+                familyFilter.appendChild(opt);
+            });
+
+            Array.from(districts).sort().forEach(dist => {
+                const opt = document.createElement('option');
+                opt.value = dist;
+                opt.textContent = dist;
+                districtFilter.appendChild(opt);
+            });
+
+            Array.from(states).sort().forEach(st => {
+                const opt = document.createElement('option');
+                opt.value = st;
+                opt.textContent = st;
+                stateFilter.appendChild(opt);
+            });
+        }
+
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase().trim();
+            const family = familyFilter.value;
+            const district = districtFilter.value;
+            const state = stateFilter.value;
+            const verify = verifyFilter.value;
+            const category = categoryFilter.value;
+
+            filteredData = herbariumData.filter(item => {
+                // Search query matching
+                const name = (item.name || '').toLowerCase();
+                const barcode = (item.barcode || '').toLowerCase();
+                const collector = (item.collectedBy || '').toLowerCase();
+                const place = (item.place || '').toLowerCase();
+                const familyVal = (item.family || '').toLowerCase();
+                
+                const matchesQuery = !query || 
+                                     name.includes(query) || 
+                                     barcode.includes(query) || 
+                                     collector.includes(query) || 
+                                     familyVal.includes(query) || 
+                                     place.includes(query);
+
+                const matchesFamily = !family || item.family === family;
+                const matchesDistrict = !district || (item.district && item.district.toUpperCase().trim() === district);
+                const matchesState = !state || (item.state && item.state.toUpperCase().trim() === state);
+                const matchesCategory = !category || item.catagory === category;
+                
+                let matchesVerify = true;
+                if (verify === "true") matchesVerify = item.verify === true;
+                else if (verify === "false") matchesVerify = item.verify !== true;
+
+                return matchesQuery && matchesFamily && matchesDistrict && matchesState && matchesVerify && matchesCategory;
+            });
+
+            renderGrid();
+        }
+
+        function renderGrid() {
+            gridContainer.innerHTML = '';
+            
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, filteredData.length);
+            const totalItems = filteredData.length;
+
+            resultCountText.textContent = `Showing ${totalItems} collections`;
+
+            if (totalItems === 0) {
+                gridContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">No records match your filters. Try adjusting your search query.</div>';
+                paginationInfo.textContent = 'Showing 0 to 0 of 0';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                return;
+            }
+
+            // Render page items
+            const pageItems = filteredData.slice(startIdx, endIdx);
+            pageItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // Fallback to web URL if local download fails, otherwise local image path
+                const imgPath = item.local_image_path ? item.local_image_path : item.photoURL;
+                
+                card.innerHTML = `
+                    <div class="card-image-wrapper">
+                        <span class="card-badge">${item.barcode || 'No Barcode'}</span>
+                        <img src="${imgPath}" alt="${item.name}" loading="lazy" onerror="this.src='https://placehold.co/240x310?text=No+Image';">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title"><em>${item.name || 'Unknown Specimen'}</em></div>
+                        <div class="card-meta">${item.family || 'Unknown Family'}</div>
+                        <div class="card-footer">
+                            <span class="status-dot ${item.verify ? 'verified' : 'unverified'}">
+                                ${item.verify ? 'Verified' : 'Unverified'}
+                            </span>
+                            <span>${item.place || 'Unknown Location'}</span>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => showDetails(item));
+                gridContainer.appendChild(card);
+            });
+
+            // Update pagination UI
+            paginationInfo.textContent = `Showing ${startIdx + 1} to ${endIdx} of ${totalItems}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = endIdx >= totalItems;
+        }
+
+        function showDetails(item) {
+            resetZoom();
+            const imgPath = item.local_image_path ? item.local_image_path : item.photoURL;
+            modalImage.src = imgPath;
+            
+            modalBarcode.textContent = item.barcode || 'N/A';
+            modalName.innerHTML = `<em>${item.name || 'Unknown'}</em>`;
+            modalAuthor.textContent = item.auther || '';
+            modalFamily.textContent = item.family || 'N/A';
+            modalCategory.textContent = item.catagory || 'N/A';
+            modalDistrict.textContent = item.district || 'N/A';
+            modalState.textContent = item.state || 'N/A';
+            modalPlace.textContent = item.place || 'N/A';
+            
+            // Format Date
+            if (item.date) {
+                try {
+                    modalDate.textContent = item.date.split('T')[0];
+                } catch(e) {
+                    modalDate.textContent = item.date;
+                }
+            } else {
+                modalDate.textContent = 'N/A';
+            }
+            
+            modalColNo.textContent = item.collectionNo || 'N/A';
+            modalCollectedBy.textContent = item.collectedBy || 'N/A';
+            
+            modalVerify.textContent = item.verify ? 'Verified' : 'Unverified';
+            modalVerify.className = item.verify ? 'status-dot verified' : 'status-dot unverified';
+            
+            modalTypeStatus.textContent = item.typeStatus || 'None';
+            
+            // Compile optional descriptive fields
+            let notesText = [];
+            if (item.habit) notesText.push(`Habit: ${item.habit}`);
+            if (item.habitat) notesText.push(`Habitat: ${item.habitat}`);
+            if (item.soilType) notesText.push(`Soil Type: ${item.soilType}`);
+            if (item.elevation) notesText.push(`Elevation: ${item.elevation}`);
+            if (item.notes) notesText.push(`Notes: ${item.notes}`);
+            
+            modalNotes.textContent = notesText.length > 0 ? notesText.join(' | ') : 'No additional descriptive data.';
+
+            detailsModal.classList.add('active');
+        }
+
+        function closeModal() {
+            detailsModal.classList.remove('active');
+            setTimeout(() => {
+                modalImage.src = '';
+                resetZoom();
+            }, 300);
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

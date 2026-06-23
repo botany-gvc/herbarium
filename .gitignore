@@ -1,0 +1,6 @@
+standalone_viewer.html
+standalone_viewer_optimized.html
+*.rar
+*.zip
+download_log.txt
+herbarium_updated.json
